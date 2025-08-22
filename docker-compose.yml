@@ -1,0 +1,11 @@
+services:
+  redis:
+    container_name: redis-db
+    image: "redis/redis-stack:latest"
+    ports:
+      - 6379:6379
+      - 8001:8001
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
