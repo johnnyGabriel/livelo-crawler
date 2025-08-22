@@ -1,8 +1,8 @@
 import pandas as pd
-from cssselector import CssSelector
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
+from livelocrawler.cssselector import CssSelector
 
 
 class LiveloCrawler():
