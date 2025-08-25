@@ -3,21 +3,24 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from livelocrawler.cssselector import CssSelector
+from selenium.webdriver.chrome.options import Options
 
 
 class LiveloCrawler():
     url = 'https://www.livelo.com.br/juntar-pontos/todos-os-parceiros'
 
     def get_partners_data(self):
-        browser = self._get_browser()
-        if (browser.current_url != self.url):
-            browser.get(self.url)
-        cards = browser.find_elements(By.CSS_SELECTOR, CssSelector.LIST_CARD.value)
-        return self._list_to_dataframe(
-            list(
-                map(lambda card: self._get_card_data(card), cards)
-            )
-        )
+        try:
+            browser = self._get_browser()
+            if (browser.current_url != self.url):
+                browser.get(self.url)
+            cards = browser.find_elements(By.CSS_SELECTOR, CssSelector.LIST_CARD.value)
+            partners_data = list(map(lambda card: self._get_card_data(card), cards))
+            return self._list_to_dataframe(partners_data)
+        except:
+            raise 'not able to connect and get data from livelo'
+        finally:
+            browser.quit()
     
     def save_partners_to_json(self, path = '.'):
         data = self.get_partners_data()
@@ -40,6 +43,8 @@ class LiveloCrawler():
         return pd.DataFrame(data, columns=['Partner', 'Score'])
     
     def _get_browser(self):
-        browser = webdriver.Chrome()
+        chrome_options = Options()
+        chrome_options.add_argument('--headless=new')
+        browser = webdriver.Chrome(options=chrome_options)
         browser.implicitly_wait(3)
         return browser
