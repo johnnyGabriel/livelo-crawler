@@ -1,10 +1,11 @@
+import os
 import pandas as pd
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from livelocrawler.cssselector import CssSelector
-from selenium.webdriver.chrome.options import Options
 
+SELENIUM_ADDRESS = f'http://{os.environ.get('SELENIUM_ADDR')}:4444'
 
 class LiveloCrawler():
     url = 'https://www.livelo.com.br/juntar-pontos/todos-os-parceiros'
@@ -43,8 +44,8 @@ class LiveloCrawler():
         return pd.DataFrame(data, columns=['Partner', 'Score'])
     
     def _get_browser(self):
-        chrome_options = Options()
+        chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless=new')
-        browser = webdriver.Chrome(options=chrome_options)
+        browser = webdriver.Remote(command_executor=SELENIUM_ADDRESS, options=chrome_options)
         browser.implicitly_wait(3)
         return browser

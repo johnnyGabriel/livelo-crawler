@@ -9,3 +9,20 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+  selenium:
+    image: "selenium/standalone-chromium:latest"
+    ports:
+      - 4444:4444
+  api:
+    container_name: flask
+    build:
+      context: .
+    restart: always
+    environment:
+      - REDIS_ADDR=redis
+      - SELENIUM_ADDR=selenium
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+      - selenium

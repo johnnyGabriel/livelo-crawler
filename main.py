@@ -1,12 +1,13 @@
 from flask import Flask
 from livelocrawler.crawler import LiveloCrawler
 from redis import Redis
+import os
 
 REDIS_HASH = 'partners'
 REDIS_CACHE_EXPIRATION = 5 * (60*60) #5h
 
 api = Flask(__name__)
-redis = Redis(host='localhost', port=6379, decode_responses=True)
+redis = Redis(host=os.environ.get('REDIS_ADDR'), port=6379, decode_responses=True)
 crawler = LiveloCrawler()
 
 def get_partners():
@@ -35,6 +36,8 @@ def get_all_partners():
         partners = get_partners()
         return transform_to_response(partners)
     except:
+        api.logger.error('error getting partners', exc_info=True)
         return 'Internal Server Error', 500
 
-
+if __name__ == "__main__":
+    api.run(host='localhost', port=8000, debug=True)
