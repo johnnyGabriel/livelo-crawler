@@ -1,0 +1,11 @@
+services:
+  redis:
+    image: "redis/redis-stack:latest"
+    restart: on-failure:3
+  selenium:
+    image: "selenium/standalone-chromium:latest"
+    restart: on-failure:3
+  api:
+    build:
+      context: .
+    restart: on-failure:3

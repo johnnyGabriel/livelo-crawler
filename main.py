@@ -21,7 +21,7 @@ def get_partners():
         partners = crawler.get_partners_data()
         partners = dict(zip(partners['Partner'], partners['Score']))
         redis.hset(REDIS_HASH, mapping=partners)
-        redis.expire(REDIS_HASH, os.getenv('REDIS_CACHE_EXP_MIN'))
+        redis.expire(REDIS_HASH, os.getenv('REDIS_CACHE_EXP'))
     return partners
 
 def transform_to_response(partners: dict):

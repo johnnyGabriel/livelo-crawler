@@ -1,0 +1,28 @@
+services:
+  redis-dev:
+    extends:
+      file: compose.yml
+      service: redis
+    ports:
+      - 6379:6379
+      - 8001:8001
+  selenium-dev:
+    extends:
+      file: compose.yml
+      service: selenium
+    ports:
+      - 4444:4444
+  api-dev:
+    extends:
+      file: compose.yml
+      service: api
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis-dev
+      - SELENIUM_HOST=selenium-dev
+    depends_on:
+      - redis-dev
+      - selenium-dev
