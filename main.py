@@ -2,12 +2,17 @@ from flask import Flask
 from livelocrawler.crawler import LiveloCrawler
 from redis import Redis
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 REDIS_HASH = 'partners'
-REDIS_CACHE_EXPIRATION = 5 * (60*60) #5h
 
 api = Flask(__name__)
-redis = Redis(host=os.environ.get('REDIS_ADDR'), port=6379, decode_responses=True)
+redis = Redis(
+    host=os.environ.get('REDIS_HOST'), 
+    port=os.getenv('REDIS_PORT'), 
+    decode_responses=True)
 crawler = LiveloCrawler()
 
 def get_partners():
@@ -16,7 +21,7 @@ def get_partners():
         partners = crawler.get_partners_data()
         partners = dict(zip(partners['Partner'], partners['Score']))
         redis.hset(REDIS_HASH, mapping=partners)
-        redis.expire(REDIS_HASH, REDIS_CACHE_EXPIRATION)
+        redis.expire(REDIS_HASH, os.getenv('REDIS_CACHE_EXP_MIN'))
     return partners
 
 def transform_to_response(partners: dict):
@@ -40,4 +45,7 @@ def get_all_partners():
         return 'Internal Server Error', 500
 
 if __name__ == "__main__":
-    api.run(host='localhost', port=8000, debug=True)
+    api.run(
+        host=os.getenv('FLASK_RUN_HOST'), 
+        port=os.getenv('FLASK_RUN_PORT'), 
+        debug=True)

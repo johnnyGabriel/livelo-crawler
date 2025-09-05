@@ -5,16 +5,15 @@ from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from livelocrawler.cssselector import CssSelector
 
-SELENIUM_ADDRESS = f'http://{os.environ.get('SELENIUM_ADDR')}:4444'
-
 class LiveloCrawler():
-    url = 'https://www.livelo.com.br/juntar-pontos/todos-os-parceiros'
-
+    partners_url = os.getenv('LIVELO_PARTNERS_URL')
+    selenium_address = f'http://{os.getenv('SELENIUM_HOST')}:{os.getenv('SELENIUM_PORT')}'
+    
     def get_partners_data(self):
         try:
             browser = self._get_browser()
-            if (browser.current_url != self.url):
-                browser.get(self.url)
+            if (browser.current_url != self.partners_url):
+                browser.get(self.partners_url)
             cards = browser.find_elements(By.CSS_SELECTOR, CssSelector.LIST_CARD.value)
             partners_data = list(map(lambda card: self._get_card_data(card), cards))
             return self._list_to_dataframe(partners_data)
@@ -46,6 +45,6 @@ class LiveloCrawler():
     def _get_browser(self):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless=new')
-        browser = webdriver.Remote(command_executor=SELENIUM_ADDRESS, options=chrome_options)
+        browser = webdriver.Remote(command_executor=self.selenium_address, options=chrome_options)
         browser.implicitly_wait(3)
         return browser
